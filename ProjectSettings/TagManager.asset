@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Bullet
+  - Weapon
   layers:
   - Default
   - TransparentFX
@@ -44,6 +46,9 @@ TagManager:
     locked: 0
   - name: Characters
     uniqueID: 3914141827
+    locked: 0
+  - name: Weapons&Bullets
+    uniqueID: 3806112837
     locked: 0
   - name: Foreground
     uniqueID: 4036287693
