@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     private Vector3 weaponScale;
     private Animator animator;
 
-    private bool  isGrounded, isJumped;
+    private bool isGrounded, isJumped;
     private bool facingRight;
 
     private float dirX;
@@ -27,9 +27,12 @@ public class Player : MonoBehaviour
     void Start()
     {
         player = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+
+        weapon.transform.SetParent(gameObject.transform);
         localScale = transform.localScale;
         weaponScale = weapon.transform.localScale;
-        animator = GetComponent<Animator>();
+       
         facingRight = true;
         currentSpeed = baseSpeed;
     }
@@ -37,6 +40,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+
+        
+        
         //Перемещение по горизонтали
         dirX = Input.GetAxis("Horizontal");     
         player.velocity = new Vector2(dirX * currentSpeed, player.velocity.y);
@@ -51,9 +57,9 @@ public class Player : MonoBehaviour
         //Спринт
         animator.SetFloat("speed", Mathf.Abs(dirX * currentSpeed));
 
-        if (Input.GetButton("Run") && currentSpeed < maxSpeed)
+        if (Input.GetButton("Run") && currentSpeed < maxSpeed && isGrounded)
             currentSpeed += acceleration;
-        else if (currentSpeed > baseSpeed)
+        else if (currentSpeed > baseSpeed && isGrounded)
             currentSpeed -= acceleration;
             
         //Перекат
@@ -87,22 +93,12 @@ public class Player : MonoBehaviour
     }
     private void LateUpdate()
     {
-        /*if (dirX > 0)
-            facingRight = true;
-        else if (dirX < 0)
-            facingRight = false;
-            
-         if (((facingRight) && (localScale.x < 0)) || ((!facingRight) && (localScale.x > 0)))
-            localScale.x *= -1;
-         */
-
         //Расчет позиции мыши на экране
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         
         //Поворот оружия и персонажа
         float angle = Mathf.Atan2(mousePos.y - weapon.transform.position.y, mousePos.x - weapon.transform.position.x) * Mathf.Rad2Deg;
 
-        //Debug.Log(angle);
 
         if ((Mathf.Abs(angle) < 70 && !facingRight) || (Mathf.Abs(angle) > 110 && facingRight)) 
         {
@@ -115,7 +111,6 @@ public class Player : MonoBehaviour
             weapon.transform.localScale = weaponScale;
             transform.localScale = localScale;
         }
-
         weapon.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
 
     }
@@ -130,7 +125,6 @@ public class Player : MonoBehaviour
         }
     }
 
-
     void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Ground")
@@ -138,7 +132,6 @@ public class Player : MonoBehaviour
             isGrounded = false;
         }
     }
-
 
     public void resetBool(string name)
     {

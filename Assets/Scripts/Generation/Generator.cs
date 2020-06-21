@@ -26,7 +26,7 @@ public class Generator : MonoBehaviour
     private TileType[][] tiles;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         boardHolder = new GameObject("BoardHolder");
 

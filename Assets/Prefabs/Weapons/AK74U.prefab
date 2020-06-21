@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2292437932741923663}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.166, y: 0.03, z: 0}
+  m_LocalPosition: {x: 0.17, y: 0.03, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7057763771151885948}
@@ -132,6 +132,8 @@ MonoBehaviour:
     type: 3}
   shotDelay: 0.1
   scatter: 20
+  ammo: 30
+  reloadTime: 2
   isAutomatic: 1
   isEquipped: 0
 --- !u!61 &5960247052940023948

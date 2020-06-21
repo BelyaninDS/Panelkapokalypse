@@ -62,9 +62,9 @@
      <Compile Include="Assets\Scripts\Misc\IntRange.cs" />
      <Compile Include="Assets\Scripts\Misc\WeaponPickup.cs" />
      <Compile Include="Assets\Scripts\Weapons\Bullet.cs" />
-     <Compile Include="Assets\Scripts\Weapons\SingleShotWeaponScript.cs" />
      <Compile Include="Assets\Scripts\Weapons\Weapon.cs" />
      <Compile Include="Assets\Scripts\Weapons\WeaponHolder.cs" />
+     <Compile Include="Assets\Scripts\Weapons\WeaponScript.cs" />
  <Reference Include="Unity.Timeline.Editor">
  <HintPath>D:/Projects/Unity 2D/DepRussian/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>

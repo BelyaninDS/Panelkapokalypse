@@ -132,6 +132,8 @@ MonoBehaviour:
     type: 3}
   shotDelay: 0.1
   scatter: 5
+  ammo: 10
+  reloadTime: 4
   isAutomatic: 0
   isEquipped: 0
 --- !u!61 &9014084340802920618

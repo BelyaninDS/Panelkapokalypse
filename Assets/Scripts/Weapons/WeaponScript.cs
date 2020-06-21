@@ -2,19 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SingleShotWeaponScript : MonoBehaviour
+public class WeaponScript : MonoBehaviour
 {
     public Transform firePoint;
     public GameObject bulletPrefab;
     public float shotDelay;
     public float scatter;
+    public int ammo;
+    public int reloadTime;
     public bool isAutomatic;
 
     [HideInInspector]
     public bool isEquipped;
 
     private float shotTime;
+    private float noAmmoTime;
     private float angle;
+    private int currentAmmo;
 
 
     // Start is called before the first frame update
@@ -22,6 +26,7 @@ public class SingleShotWeaponScript : MonoBehaviour
     {
         firePoint.SetParent(gameObject.transform);
         shotTime = Time.time;
+        currentAmmo = ammo;
     }
 
 
@@ -32,36 +37,57 @@ public class SingleShotWeaponScript : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         angle = Mathf.Atan2(mousePos.y - firePoint.position.y, mousePos.x - firePoint.transform.position.x) * Mathf.Rad2Deg;
 
-        if (Time.time > shotTime + shotDelay && isEquipped)
+        Debug.Log(currentAmmo);
+
+        //Триггер события перезарядки
+        if ((currentAmmo >= 0  &&  Input.GetButtonDown("Reload")) || (currentAmmo == 0 && Input.GetButtonDown("Fire1")))
         {
+            noAmmoTime = Time.time;
+            currentAmmo = -1;
+        }
+        //Перезарядка
+        if (currentAmmo < 0 && Time.time > noAmmoTime + reloadTime)
+            currentAmmo = ammo;
+
+
+        //Стрельба
+        if (Time.time > shotTime + shotDelay && isEquipped && currentAmmo > 0)
+        {
+            //Для автомата
             if (isAutomatic)
             {
                 if (Input.GetButton("Fire1"))
                 {
                     Shoot();
-                    shotTime = Time.time;
                 }
             }
             else
             {
+                //Для полуавтомата
                 if (Input.GetButtonDown("Fire1"))
                 {
                     Shoot();
-                    shotTime = Time.time;
                 }
             }
         }
     }
 
+
+    //Выстрел
     void Shoot()
     {
-        angle += Random.Range(-scatter / 2, scatter / 2);
+        --currentAmmo;
+        shotTime = Time.time;
+
+        angle += Random.Range(-scatter/2, scatter/2);
         GameObject bulletInstance = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, angle));
 
         angle *= Mathf.Deg2Rad;
         bulletInstance.GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
     }
 
+
+    //Вспомогательные функции для системы подбора оружия
     public void SetEquipped(bool value)
     {
         if (value)

@@ -14,19 +14,22 @@ public class WeaponHolder : MonoBehaviour
         if (weaponPrefab != null)
         {
             weaponPrefab = Instantiate(weaponPrefab, holder.position + Vector3.right * transform.localScale.x * 0.1f, holder.rotation);
-            weaponPrefab.GetComponent<SingleShotWeaponScript>().enabled = true;
-            weaponPrefab.GetComponent<SingleShotWeaponScript>().SetEquipped(true);
+            weaponPrefab.GetComponent<WeaponScript>().enabled = true;
+            weaponPrefab.GetComponent<WeaponScript>().SetEquipped(true);
             weaponPrefab.transform.SetParent(holder);          
         }
     }
 
+    //Обновить оружие
     public void UpdateWeapon()
     {
         if (weaponPrefab != null)
         {
-            weaponPrefab = Instantiate(weaponPrefab, holder.position + Vector3.right * transform.localScale.x * 0.1f, holder.rotation);
-            weaponPrefab.GetComponent<SingleShotWeaponScript>().enabled = true;
-            weaponPrefab.GetComponent<SingleShotWeaponScript>().SetEquipped(true);
+            holder.rotation = Quaternion.identity;
+            weaponPrefab = Instantiate(weaponPrefab, holder.position + Vector3.right * 0.1f, holder.rotation);
+            weaponPrefab.transform.localScale = new Vector3(1f, transform.localScale.y, transform.localScale.z);    //немного костыль
+            weaponPrefab.GetComponent<WeaponScript>().enabled = true;
+            weaponPrefab.GetComponent<WeaponScript>().SetEquipped(true);
             weaponPrefab.transform.SetParent(holder);           
         }
     }
