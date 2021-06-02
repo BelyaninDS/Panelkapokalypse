@@ -6,25 +6,36 @@ public class WeaponScript : MonoBehaviour
 {
     public Transform firePoint;
     public GameObject bulletPrefab;
+    public AudioClip shotSound;
     public float shotDelay;
     public float scatter;
     public int ammo;
     public int reloadTime;
     public bool isAutomatic;
+    public bool isShotgun;
 
     [HideInInspector]
-    public bool isEquipped;
+    public bool isEquipped;                //Флаг проверки, экипирован ли текущий объект кем-либо
+    [HideInInspector]
+    public bool holdByEnemy;               //Флаг проверки, держит ли оружие противник
+    [HideInInspector]
+    public int currentAmmo;                //Текущий остаток боезапаса в магазине
 
+    private AudioSource shotSoundHandler;
     private float shotTime;
     private float noAmmoTime;
     private float angle;
-    private int currentAmmo;
+    
 
 
     // Start is called before the first frame update
     void Start()
     {
         firePoint.SetParent(gameObject.transform);
+
+        shotSoundHandler = GetComponent<AudioSource>();
+        shotSoundHandler.clip = shotSound;
+
         shotTime = Time.time;
         currentAmmo = ammo;
     }
@@ -35,38 +46,40 @@ public class WeaponScript : MonoBehaviour
     {
         //Расчет угла поворота оружия относительно горизонтальной плоскости
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        angle = Mathf.Atan2(mousePos.y - firePoint.position.y, mousePos.x - firePoint.transform.position.x) * Mathf.Rad2Deg;
+        angle = Mathf.Atan2(mousePos.y - firePoint.position.y, mousePos.x - firePoint.transform.position.x) * Mathf.Rad2Deg;    //Градусы
 
-        Debug.Log(currentAmmo);
-
-        //Триггер события перезарядки
-        if ((currentAmmo >= 0  &&  Input.GetButtonDown("Reload")) || (currentAmmo == 0 && Input.GetButtonDown("Fire1")))
+        //Если оружие держит НЕ противник (Бот)
+        if (!holdByEnemy)
         {
-            noAmmoTime = Time.time;
-            currentAmmo = -1;
-        }
-        //Перезарядка
-        if (currentAmmo < 0 && Time.time > noAmmoTime + reloadTime)
-            currentAmmo = ammo;
-
-
-        //Стрельба
-        if (Time.time > shotTime + shotDelay && isEquipped && currentAmmo > 0)
-        {
-            //Для автомата
-            if (isAutomatic)
+            //Триггер события перезарядки
+            if ((currentAmmo >= 0 && Input.GetButtonDown("Reload")) || (currentAmmo == 0 && Input.GetButtonDown("Fire1")))
             {
-                if (Input.GetButton("Fire1"))
-                {
-                    Shoot();
-                }
+                noAmmoTime = Time.time;
+                currentAmmo = -1;
             }
-            else
+            //Перезарядка
+            if (currentAmmo < 0 && Time.time > noAmmoTime + reloadTime)
+                currentAmmo = ammo;
+
+
+            //Стрельба
+            if (Time.time > shotTime + shotDelay && isEquipped && currentAmmo > 0)
             {
-                //Для полуавтомата
-                if (Input.GetButtonDown("Fire1"))
+                //Для автомата
+                if (isAutomatic)
                 {
-                    Shoot();
+                    if (Input.GetButton("Fire1"))
+                    {
+                        Shoot();
+                    }
+                }
+                else
+                {
+                    //Для полуавтомата
+                    if (Input.GetButtonDown("Fire1"))
+                    {
+                        Shoot();
+                    }
                 }
             }
         }
@@ -76,24 +89,62 @@ public class WeaponScript : MonoBehaviour
     //Выстрел
     void Shoot()
     {
-        --currentAmmo;
-        shotTime = Time.time;
+        //Для дробовика
+        if (isShotgun)
+        {
+            float currentAngle = angle;                                 //Градусы
+            GameObject[] bulletInstances = new GameObject[6];
+            --currentAmmo;
+            shotTime = Time.time;
+            shotSoundHandler.Play();
+            
+            for (int i = 0; i < 6; i++)
+            {
+                currentAngle += Random.Range(-scatter / 2, scatter / 2);    //Градусы
+                currentAngle = currentAngle + scatter/(i+1 / 6);             
+                bulletInstances[i] = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, currentAngle));
 
-        angle += Random.Range(-scatter/2, scatter/2);
-        GameObject bulletInstance = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, angle));
+                currentAngle *= Mathf.Deg2Rad;   //Радианы
+                bulletInstances[i].GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle), 0f);
+            }
+        }
+        //Остальное оружие
+        else
+        {
+            --currentAmmo;
+            shotTime = Time.time;
+            shotSoundHandler.Play();
 
-        angle *= Mathf.Deg2Rad;
-        bulletInstance.GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
+            angle += Random.Range(-scatter / 2, scatter / 2);         
+            GameObject bulletInstance = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, angle));
+
+            angle *= Mathf.Deg2Rad;
+            bulletInstance.GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
+        }
     }
 
-
-    //Вспомогательные функции для системы подбора оружия
-    public void SetEquipped(bool value)
+    //Подбор оружия
+    void OnTriggerStay2D(Collider2D other)
     {
-        if (value)
-            isEquipped = true;
-        else
-            isEquipped = false;
+        if (other.tag == "Player" && gameObject.GetComponent<WeaponScript>().isEquipped == false && Input.GetButtonDown("Interact"))
+        {
+            other.GetComponentInChildren<WeaponScript>().SetEquipped(false);
+            Instantiate(other.GetComponentInChildren<WeaponScript>().gameObject, transform.position, Quaternion.identity);
+            other.GetComponentInChildren<WeaponScript>().DestroyWeapon();
+
+            //Создаем новое оружие в холдере, даем статус "экипировано"
+            other.GetComponentInChildren<WeaponHolder>().weaponPrefab = gameObject;
+            gameObject.GetComponent<WeaponScript>().SetEquipped(true);
+            other.GetComponentInChildren<WeaponHolder>().UpdateWeapon();
+
+            Destroy(gameObject);
+        }
+    }
+
+        //Вспомогательные функции для системы подбора оружия
+        public void SetEquipped(bool value)
+    {
+        isEquipped = value;
     }
 
     public void DestroyWeapon()

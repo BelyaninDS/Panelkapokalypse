@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class WeaponHolder : MonoBehaviour
 {
-    //[HideInInspector]
+    //Текущее оружие
     public GameObject weaponPrefab;
 
+    [HideInInspector]
     public Transform holder;
 
     void Start()
     {
+        holder = transform;
         if (weaponPrefab != null)
         {
             weaponPrefab = Instantiate(weaponPrefab, holder.position + Vector3.right * transform.localScale.x * 0.1f, holder.rotation);
@@ -30,7 +32,7 @@ public class WeaponHolder : MonoBehaviour
             weaponPrefab.transform.localScale = new Vector3(1f, transform.localScale.y, transform.localScale.z);    //немного костыль
             weaponPrefab.GetComponent<WeaponScript>().enabled = true;
             weaponPrefab.GetComponent<WeaponScript>().SetEquipped(true);
-            weaponPrefab.transform.SetParent(holder);           
+            weaponPrefab.transform.SetParent(holder);
         }
     }
 

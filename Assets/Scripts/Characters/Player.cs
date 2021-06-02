@@ -17,10 +17,11 @@ public class Player : MonoBehaviour
     private Vector3 weaponScale;
     private Animator animator;
 
-    private bool isGrounded, isJumped;
+    private bool isGrounded, isJumped, isClimbing;
     private bool facingRight;
 
     private float dirX;
+    private float dirY;
     private float currentSpeed;
 
     // Start is called before the first frame update
@@ -40,9 +41,9 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        //Возвращение гравитации в нормальное значение после изменения (например, взаимодействие с лестницей)
+        player.gravityScale = 1;
 
-        
-        
         //Перемещение по горизонтали
         dirX = Input.GetAxis("Horizontal");     
         player.velocity = new Vector2(dirX * currentSpeed, player.velocity.y);
@@ -54,7 +55,7 @@ public class Player : MonoBehaviour
             isJumped = true;
         }
 
-        //Спринт
+        //Бег
         animator.SetFloat("speed", Mathf.Abs(dirX * currentSpeed));
 
         if (Input.GetButton("Run") && currentSpeed < maxSpeed && isGrounded)
@@ -67,6 +68,12 @@ public class Player : MonoBehaviour
         {          
             animator.SetBool("isRolling", true);
             currentSpeed = maxSpeed;             
+        }
+
+        //Подъем по лестнице
+        if (isClimbing)
+        {
+            InteractWithLadder();
         }
 
            
@@ -91,7 +98,7 @@ public class Player : MonoBehaviour
 
 
     }
-    private void LateUpdate()
+    void LateUpdate()
     {
         //Расчет позиции мыши на экране
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -114,31 +121,70 @@ public class Player : MonoBehaviour
         weapon.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, angle));
 
     }
-
-
-    void OnCollisionEnter2D(Collision2D collision)
+    //Взаимодействие с лестницами
+    private void InteractWithLadder()
     {
-        if (collision.gameObject.tag == "Ground")
+        player.gravityScale = 0;
+        dirY = Input.GetAxis("Vertical");
+        player.velocity = new Vector2(0f, dirY);
+    }
+
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "Ground")
         {
             isGrounded = true;
             isJumped = false;
         }
+
+        if (other.gameObject.tag == "Platform")
+        {
+            if (isClimbing)
+                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), other.gameObject.GetComponent<Collider2D>());
+            else
+                Physics2D.IgnoreCollision(GetComponent<Collider2D>(), other.gameObject.GetComponent<Collider2D>(), false);
+        }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+    void OnCollisionExit2D(Collision2D other)
     {
-        if (collision.gameObject.tag == "Ground")
+        if (other.gameObject.tag == "Ground")
         {
             isGrounded = false;
         }
     }
 
-    public void resetBool(string name)
+    private void resetBool(string name)
     {
          animator.SetBool(name, false);
     }
-            
 
+
+    void OnTriggerStay2D(Collider2D other)
+    {
+        
+        if (other.gameObject.tag == "Ladder" & Input.GetButtonDown("Interact"))
+        {
+            //Притягивание игрока к лестнице 
+            transform.position = new Vector2(other.gameObject.transform.position.x, transform.position.y);
+
+            //Инверсия переменной isClimbing по взаимодействию
+            if (isClimbing)
+                isClimbing = false;
+            else
+                isClimbing = true;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Ladder")
+        {
+            isClimbing = false;
+        }
+                     
+    }
 }
 
 
