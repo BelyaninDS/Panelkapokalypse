@@ -9,8 +9,9 @@ public class WeaponScript : MonoBehaviour
     public AudioClip shotSound;
     public float shotDelay;
     public float scatter;
-    public int ammo;
+    public int magRoundsCount;
     public int reloadTime;
+
     public bool isAutomatic;
     public bool isShotgun;
 
@@ -25,19 +26,21 @@ public class WeaponScript : MonoBehaviour
     private float shotTime;
     private float noAmmoTime;
     private float angle;
-    
+    public Weapon weapon;
 
+    private 
 
     // Start is called before the first frame update
     void Start()
     {
-        firePoint.SetParent(gameObject.transform);
+        weapon = new Weapon(firePoint, bulletPrefab, shotDelay, scatter, reloadTime, magRoundsCount);
+
+        weapon.firePoint.SetParent(gameObject.transform);
 
         shotSoundHandler = GetComponent<AudioSource>();
         shotSoundHandler.clip = shotSound;
 
         shotTime = Time.time;
-        currentAmmo = ammo;
     }
 
 
@@ -48,78 +51,34 @@ public class WeaponScript : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         angle = Mathf.Atan2(mousePos.y - firePoint.position.y, mousePos.x - firePoint.transform.position.x) * Mathf.Rad2Deg;    //Градусы
 
+
         //Если оружие держит НЕ противник (Бот)
-        if (!holdByEnemy)
+        if (!holdByEnemy && isEquipped)
         {
             //Триггер события перезарядки
-            if ((currentAmmo >= 0 && Input.GetButtonDown("Reload")) || (currentAmmo == 0 && Input.GetButtonDown("Fire1")))
-            {
-                noAmmoTime = Time.time;
-                currentAmmo = -1;
-            }
-            //Перезарядка
-            if (currentAmmo < 0 && Time.time > noAmmoTime + reloadTime)
-                currentAmmo = ammo;
-
-
+            if ((weapon.currentAmmo >= 0 && Input.GetButtonDown("Reload")) || (weapon.currentAmmo == 0 && Input.GetButtonDown("Fire1")))
+                weapon.Reload();
+                
             //Стрельба
-            if (Time.time > shotTime + shotDelay && isEquipped && currentAmmo > 0)
+            //Для автомата
+            if (isAutomatic)
             {
-                //Для автомата
-                if (isAutomatic)
+                if (Input.GetButton("Fire1"))       
                 {
-                    if (Input.GetButton("Fire1"))
-                    {
-                        Shoot();
-                    }
+                    weapon.Shoot(angle);
+                    shotSoundHandler.Play();
                 }
                 else
                 {
                     //Для полуавтомата
                     if (Input.GetButtonDown("Fire1"))
                     {
-                        Shoot();
+                        weapon.Shoot(angle);
+                        shotSoundHandler.Play();
                     }
                 }
+                
             }
-        }
-    }
-
-
-    //Выстрел
-    void Shoot()
-    {
-        //Для дробовика
-        if (isShotgun)
-        {
-            float currentAngle = angle;                                 //Градусы
-            GameObject[] bulletInstances = new GameObject[6];
-            --currentAmmo;
-            shotTime = Time.time;
-            shotSoundHandler.Play();
-            
-            for (int i = 0; i < 6; i++)
-            {
-                currentAngle += Random.Range(-scatter / 2, scatter / 2);    //Градусы
-                currentAngle = currentAngle + scatter/(i+1 / 6);             
-                bulletInstances[i] = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, currentAngle));
-
-                currentAngle *= Mathf.Deg2Rad;   //Радианы
-                bulletInstances[i].GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle), 0f);
-            }
-        }
-        //Остальное оружие
-        else
-        {
-            --currentAmmo;
-            shotTime = Time.time;
-            shotSoundHandler.Play();
-
-            angle += Random.Range(-scatter / 2, scatter / 2);         
-            GameObject bulletInstance = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, angle));
-
-            angle *= Mathf.Deg2Rad;
-            bulletInstance.GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
         }
     }
 

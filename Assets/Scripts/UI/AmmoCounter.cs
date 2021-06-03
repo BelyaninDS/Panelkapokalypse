@@ -19,7 +19,7 @@ public class AmmoCounter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ammo = player.GetComponentInChildren<WeaponScript>().currentAmmo;
+        ammo = player.GetComponentInChildren<WeaponScript>().weapon.currentAmmo;
         if (ammo >= 0)
             uitext.text = ammo.ToString();
     }

@@ -133,7 +133,7 @@ MonoBehaviour:
   shotSound: {fileID: 8300000, guid: 43f25732a5ab51e42b87b7b57df8326e, type: 3}
   shotDelay: 0.1
   scatter: 5
-  ammo: 10
+  magRoundsCount: 10
   reloadTime: 4
   isAutomatic: 0
   isShotgun: 0
