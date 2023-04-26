@@ -22,16 +22,16 @@ AnimationClip:
     - time: 0
       value: {fileID: -7638454663246314312, guid: da8d38d81e7e5a34c9e4f00aefa1febf,
         type: 3}
-    - time: 0.1
+    - time: 0.033333335
       value: {fileID: 3475725530208785133, guid: da8d38d81e7e5a34c9e4f00aefa1febf,
         type: 3}
-    - time: 0.21666667
+    - time: 0.15
       value: {fileID: 357074121679674571, guid: da8d38d81e7e5a34c9e4f00aefa1febf,
         type: 3}
-    - time: 0.31666666
+    - time: 0.26666668
       value: {fileID: 7587980292398049707, guid: da8d38d81e7e5a34c9e4f00aefa1febf,
         type: 3}
-    - time: 0.41666666
+    - time: 0.4
       value: {fileID: -1755333135631728019, guid: da8d38d81e7e5a34c9e4f00aefa1febf,
         type: 3}
     attribute: m_Sprite

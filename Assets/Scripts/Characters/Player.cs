@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class Player : MonoBehaviour
 {
@@ -37,22 +39,28 @@ public class Player : MonoBehaviour
         facingRight = true;
         currentSpeed = baseSpeed;
     }
-
+    
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
+        //======Debug=======        
+        Debug.Log(player.transform.localPosition.x);
+        
+        //==================
+
         //Возвращение гравитации в нормальное значение после изменения (например, взаимодействие с лестницей)
-        player.gravityScale = 1;
+        //player.gravityScale = 1;
 
         //Перемещение по горизонтали
         dirX = Input.GetAxis("Horizontal");     
         player.velocity = new Vector2(dirX * currentSpeed, player.velocity.y);
      
         //Прыжок
-        if (Input.GetButtonDown("Jump") && !isJumped)
+        if (Input.GetButton("Jump") && isGrounded)
         {
-            player.velocity = new Vector2(player.velocity.x, jumpForce);
-            isJumped = true;
+            //player.velocity = new Vector2(player.velocity.x, jumpForce);
+            player.AddRelativeForce(Vector2.up * jumpForce);
+            isGrounded = false;
         }
 
         //Бег
@@ -62,21 +70,25 @@ public class Player : MonoBehaviour
             currentSpeed += acceleration;
         else if (currentSpeed > baseSpeed && isGrounded)
             currentSpeed -= acceleration;
-            
-        //Перекат
-        if (Input.GetButtonDown("Fire2"))
-        {          
-            animator.SetBool("isRolling", true);
-            currentSpeed = maxSpeed;             
-        }
 
-        //Подъем по лестнице
-        if (isClimbing)
+        //[BROKEN]
+        //Перекат 
+        /*if (Input.GetButtonDown("Fire2"))
+        {
+            Vector3 mousePos = Input.mousePosition;
+
+            animator.SetBool("isRolling", true);
+            player.AddForce(Vector2.right * Math.Sign(Camera.main.ScreenToWorldPoint(mousePos).x - player.position.x) * 50); 
+        }*/
+
+        //[BROKEN]
+        //Подъем по лестнице 
+        /*if (isClimbing)
         {
             InteractWithLadder();
-        }
+        }*/
 
-           
+
         /*
         if (player.velocity.y >= 1)
             animator.SetBool("isJumping", true);
@@ -128,7 +140,7 @@ public class Player : MonoBehaviour
         dirY = Input.GetAxis("Vertical");
         player.velocity = new Vector2(0f, dirY);
     }
-
+    
 
     void OnCollisionEnter2D(Collision2D other)
     {
