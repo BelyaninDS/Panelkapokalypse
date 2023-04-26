@@ -42,7 +42,7 @@ public class WeaponScript : MonoBehaviour
 
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         //Расчет угла поворота оружия относительно горизонтальной плоскости
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
