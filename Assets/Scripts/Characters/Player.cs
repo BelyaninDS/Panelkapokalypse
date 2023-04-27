@@ -44,8 +44,7 @@ public class Player : MonoBehaviour
     void Update()
     {
         //======Debug=======        
-        Debug.Log(player.transform.localPosition.x);
-        
+      
         //==================
 
         //Возвращение гравитации в нормальное значение после изменения (например, взаимодействие с лестницей)

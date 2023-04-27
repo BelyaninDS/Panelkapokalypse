@@ -92,20 +92,21 @@ public class WeaponScript : MonoBehaviour
         //Для дробовика
         if (isShotgun)
         {
-            float currentAngle = angle;                                 //Градусы
+            float currentAngle = angle - scatter/2;    //Градусы
+
             GameObject[] bulletInstances = new GameObject[6];
             --currentAmmo;
             shotTime = Time.time;
             shotSoundHandler.Play();
-            
+                     
             for (int i = 0; i < 6; i++)
-            {
-                currentAngle += Random.Range(-scatter / 2, scatter / 2);    //Градусы
-                currentAngle = currentAngle + scatter/(i+1 / 6);             
+            {     
+                currentAngle = angle + Random.Range(-scatter / 2, scatter / 2);
                 bulletInstances[i] = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, currentAngle));
+                //currentAngle += scatter/(i+1/6);     //Градусы
 
                 currentAngle *= Mathf.Deg2Rad;   //Радианы
-                bulletInstances[i].GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle), 0f);
+                bulletInstances[i].GetComponent<Rigidbody2D>().velocity = 10f * new Vector2(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle));
             }
         }
         //Остальное оружие
@@ -124,7 +125,7 @@ public class WeaponScript : MonoBehaviour
     }
 
     //Подбор оружия
-    void OnTriggerStay2D(Collider2D other)
+    /*void OnTriggerStay2D(Collider2D other)
     {
         if (other.tag == "Player" && gameObject.GetComponent<WeaponScript>().isEquipped == false && Input.GetButtonDown("Interact"))
         {
@@ -139,7 +140,7 @@ public class WeaponScript : MonoBehaviour
 
             Destroy(gameObject);
         }
-    }
+    }*/
 
         //Вспомогательные функции для системы подбора оружия
         public void SetEquipped(bool value)
