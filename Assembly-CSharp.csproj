@@ -67,6 +67,7 @@
     <Compile Include="Assets\Scripts\Generation\Grid.cs" />
     <Compile Include="Assets\Scripts\Characters\Player.cs" />
     <Compile Include="Assets\Scripts\Weapons\WeaponScript.cs" />
+    <Compile Include="Assets\Scripts\Sound\ObjectFaling.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

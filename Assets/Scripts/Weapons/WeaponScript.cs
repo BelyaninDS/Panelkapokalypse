@@ -63,7 +63,7 @@ public class WeaponScript : MonoBehaviour
 
 
             //Стрельба
-            if (Time.time > shotTime + shotDelay && isEquipped && currentAmmo > 0)
+            if ((Time.time > shotTime + shotDelay || currentAmmo == ammo) && isEquipped && currentAmmo > 0)
             {
                 //Для автомата
                 if (isAutomatic)
@@ -98,15 +98,16 @@ public class WeaponScript : MonoBehaviour
             --currentAmmo;
             shotTime = Time.time;
             shotSoundHandler.Play();
+            
                      
             for (int i = 0; i < 6; i++)
             {     
                 currentAngle = angle + Random.Range(-scatter / 2, scatter / 2);
-                bulletInstances[i] = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, currentAngle));
-                //currentAngle += scatter/(i+1/6);     //Градусы
+                bulletInstances[i] = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, currentAngle));               
 
                 currentAngle *= Mathf.Deg2Rad;   //Радианы
-                bulletInstances[i].GetComponent<Rigidbody2D>().velocity = 10f * new Vector2(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle));
+                bulletInstances[i].GetComponent<Rigidbody2D>().velocity = 15f * new Vector2(Mathf.Cos(currentAngle), Mathf.Sin(currentAngle));
+                bulletInstances[i].GetComponent<AudioSource>().clip = shotSound;
             }
         }
         //Остальное оружие
@@ -120,7 +121,8 @@ public class WeaponScript : MonoBehaviour
             GameObject bulletInstance = Instantiate(bulletPrefab, firePoint.position, Quaternion.Euler(0f, 0f, angle));
 
             angle *= Mathf.Deg2Rad;
-            bulletInstance.GetComponent<Rigidbody2D>().velocity = 10f * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
+            bulletInstance.GetComponent<Rigidbody2D>().velocity = 15f * new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f);
+            bulletInstance.GetComponent<AudioSource>().clip = shotSound;
         }
     }
 

@@ -335,11 +335,12 @@
 "Assets/Scripts/Generation/Grid.cs"
 "Assets/Scripts/Misc/CameraMove.cs"
 "Assets/Scripts/Misc/IntRange.cs"
+"Assets/Scripts/Sound/ObjectFaling.cs"
 "Assets/Scripts/UI/AmmoCounter.cs"
-"Assets/Scripts/Weapons/(Unused)WeaponPickup.cs"
 "Assets/Scripts/Weapons/Bullet.cs"
 "Assets/Scripts/Weapons/Weapon.cs"
 "Assets/Scripts/Weapons/WeaponHolder.cs"
+"Assets/Scripts/Weapons/WeaponPickup.cs"
 "Assets/Scripts/Weapons/WeaponScript.cs"
 -langversion:9.0
 

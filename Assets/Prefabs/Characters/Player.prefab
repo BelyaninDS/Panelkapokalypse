@@ -105,7 +105,7 @@ MonoBehaviour:
   baseSpeed: 1
   maxSpeed: 2
   acceleration: 0.1
-  jumpForce: 10
+  jumpForce: 10000
   weapon: {fileID: 1611077552596953877}
 --- !u!50 &7291503923192870284
 Rigidbody2D:
@@ -118,8 +118,8 @@ Rigidbody2D:
   m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 1
-  m_Mass: 0.07161051
+  m_UseAutoMass: 0
+  m_Mass: 80
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
